@@ -43,7 +43,8 @@ namespace WFSimulation
 
             // Calculate reference intensity
             double ref_intensity = 0.0;
-            for (int i = 0; i < 100000; i++)
+            int samples_num = 100000;
+            for (int i = 0; i < samples_num; i++)
             {
                 Complex[] wavefront = RandomNormalComplex(0.0, 3.0, ch_num);
                 Complex c_wave = new Complex();
@@ -52,7 +53,7 @@ namespace WFSimulation
                 
                 ref_intensity += c_wave.MagnitudeSquared();
             }
-            ref_intensity /= 100000;
+            ref_intensity /= samples_num;
             Console.WriteLine("Reference intensity: {0}", ref_intensity);
             Console.WriteLine("Press ENTER to continue...");
             Console.ReadLine();
@@ -61,13 +62,15 @@ namespace WFSimulation
 
             Console.WriteLine("Contineous sequential algorithm (binary amplitude) w/o noise...");
             ContineousSeqA csa_wo_noise = new ContineousSeqA(wf);
-            csa_wo_noise = (ContineousSeqA)AlgorithmRunner.Run(csa_wo_noise, ch_num * loops_c, "/tmp/seq_wo_noise.txt");
+            csa_wo_noise = (ContineousSeqA)AlgorithmRunner.Run(
+                csa_wo_noise, ch_num * loops_c, "/tmp/seq_wo_noise.txt", ref_intensity / 2.0);
             double intensity_wo_noise = csa_wo_noise.GetIntensity();
             Console.WriteLine("I_opt = {0:e}, enh. = {1}", intensity_wo_noise, 2 * intensity_wo_noise / ref_intensity);
 
             Console.WriteLine("Contineous sequential algorithm (binary amplitude) w/o noise...");
             ContineousSeqA csa_w_noise = new ContineousSeqA(wf, GenerateGaussianNoise);
-            csa_w_noise = (ContineousSeqA)AlgorithmRunner.Run(csa_w_noise, ch_num * loops_c, "/tmp/seq_w_noise.txt");
+            csa_w_noise = (ContineousSeqA)AlgorithmRunner.Run(
+                csa_w_noise, ch_num * loops_c, "/tmp/seq_w_noise.txt", ref_intensity / 2.0);
             double intensity_w_noise = csa_w_noise.GetIntensity();
             Console.WriteLine("I_opt = {0:e}, enh. = {1}", intensity_w_noise, 2 * intensity_w_noise / ref_intensity);
 
